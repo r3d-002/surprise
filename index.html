@@ -3,782 +3,197 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>The Challenge ❤️</title>
 
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
 <style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, Helvetica, sans-serif;
-}
-
-body{
-    background:#000;
-    color:#fff;
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:20px;
-}
-
-.page{
-    display:none;
-    width:100%;
-    max-width:500px;
-    text-align:center;
-}
-
-.active{
-    display:block;
-}
-
-h1,h2{
-    color:#a855f7;
-    margin-bottom:20px;
-}
-
-.btn{
-    background:#9333ea;
-    color:white;
-    border:none;
-    border-radius:12px;
-    padding:15px 30px;
-    cursor:pointer;
-    font-size:18px;
-    transition:.3s;
-}
-
-.btn:hover{
-    transform:scale(1.05);
-}
-
-.clicked{
-    background:red;
-}
-
-#gamePage{
-    touch-action:none;
-}
-
-#gameBoard{
-    width:320px;
-    height:320px;
-    margin:auto;
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:6px;
-}
-
-.cell{
-    background:#111;
-    border:2px solid #7e22ce;
-    border-radius:8px;
-}
-
-.snake{
-    background:#a855f7;
-    box-shadow:
-        0 0 10px #a855f7,
-        0 0 20px #a855f7;
-}
-
-.apple{
-    background:red;
-    box-shadow:
-        0 0 10px red,
-        0 0 20px red;
-}
-
-input[type=email]{
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:10px;
-    margin-bottom:20px;
-}
-
-.question{
-    text-align:left;
-    margin-bottom:30px;
-}
-
-.question h3{
-    color:#c084fc;
-    margin-bottom:10px;
-}
-
-.option{
-    margin-bottom:10px;
-}
-
-#scoreText{
-    margin-bottom:15px;
-    color:#c084fc;
-    font-size:18px;
-}
-
-@media(max-width:500px){
-
-    #gameBoard{
-        width:280px;
-        height:280px;
-    }
-
-    h1{
-        font-size:30px;
-    }
-
-    .btn{
-        width:100%;
-    }
-}
-
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+body{background:#000;color:#fff;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
+.page{display:none;width:100%;max-width:520px;text-align:center}
+.active{display:block}
+h1,h2{color:#a855f7;margin-bottom:20px}
+.btn{background:#9333ea;color:#fff;border:none;border-radius:12px;padding:15px 30px;font-size:18px;cursor:pointer}
+.clicked{background:red}
+#gameBoard{width:320px;height:320px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.cell{background:#111;border:2px solid #7e22ce;border-radius:8px}
+.snake{background:#a855f7;box-shadow:0 0 10px #a855f7,0 0 20px #a855f7}
+.apple{background:red;box-shadow:0 0 10px red,0 0 20px red}
+#scoreText{margin-bottom:10px;color:#c084fc}
+#mobileControls{margin-top:25px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.middleRow{display:flex;gap:20px}
+.arrowBtn{width:80px;height:80px;border:none;border-radius:15px;background:#9333ea;color:white;font-size:36px;cursor:pointer}
+.arrowBtn:active{background:red;transform:scale(.95)}
+input[type=email]{width:100%;padding:14px;border-radius:10px;border:none;margin-bottom:15px}
+.question{text-align:left;margin-bottom:25px}
+.question h3{color:#c084fc;margin-bottom:10px}
+.option{margin-bottom:8px}
+@media(max-width:500px){#gameBoard{width:280px;height:280px}.btn{width:100%}}
 </style>
 </head>
 <body>
 
-<!-- LANDING PAGE -->
-
 <div id="landing" class="page active">
-
-    <h1>Welcome to the Challenge</h1>
-
-    <button
-        id="startBtn"
-        class="btn">
-        Start
-    </button>
-
+<h1>Welcome to the Challenge</h1>
+<button id="startBtn" class="btn">Start</button>
 </div>
-
-<!-- GAME PAGE -->
 
 <div id="gamePage" class="page">
+<h2>Snake Challenge</h2>
+<p id="scoreText">Apples Collected: 0 / 5</p>
+<p style="margin-bottom:15px;color:#c084fc;">Use the arrows below to guide the snake</p>
+<div id="gameBoard"></div>
 
-    <h2>Snake Challenge</h2>
-
-    <p id="scoreText">
-        Apples Collected: 0 / 5
-    </p>
-
-    <p style="margin-bottom:15px;color:#c084fc;">
-        📱 Swipe on mobile or use arrow keys
-    </p>
-
-    <div id="gameBoard"></div>
-
-    <div
-        id="winSection"
-        style="display:none;margin-top:30px;">
-
-        <h2>Challenge Completed ❤️</h2>
-
-        <button
-            class="btn"
-            onclick="showPage('emailPage')">
-
-            Claim Prize
-
-        </button>
-
-    </div>
-
+<div id="mobileControls">
+<button class="arrowBtn" onclick="changeDirection('up')">↑</button>
+<div class="middleRow">
+<button class="arrowBtn" onclick="changeDirection('left')">←</button>
+<button class="arrowBtn" onclick="changeDirection('right')">→</button>
+</div>
+<button class="arrowBtn" onclick="changeDirection('down')">↓</button>
 </div>
 
-<!-- EMAIL PAGE -->
+<div id="winSection" style="display:none;margin-top:25px;">
+<h2>Challenge Completed ❤️</h2>
+<button class="btn" onclick="showPage('emailPage')">Claim Prize</button>
+</div>
+</div>
 
 <div id="emailPage" class="page">
-
-    <h1>Congratulations on Your Win</h1>
-
-    <h2>Claim Prize</h2>
-
-    <input
-        type="email"
-        id="email"
-        placeholder="Enter Your Email">
-
-    <button
-        class="btn"
-        onclick="submitEmail()">
-
-        Submit
-
-    </button>
-
+<h1>Congratulations on Your Win</h1>
+<h2>Claim Prize</h2>
+<input type="email" id="email" placeholder="Enter your email">
+<button class="btn" onclick="submitEmail()">Submit</button>
 </div>
 
-<!-- QUESTIONS PAGE -->
-
 <div id="questionPage" class="page">
-
 <form id="finalForm">
-
 <h1>Final Questions</h1>
 
 <div class="question">
-
 <h3>1. What does tonight look like?</h3>
-
-<div class="option">
-<input type="radio" name="night" value="Cosy Night In" required>
-Cosy Night In
-</div>
-
-<div class="option">
-<input type="radio" name="night" value="Thrill of the Cruise">
-Thrill of the Cruise
-</div>
-
-<div class="option">
-<input type="radio" name="night" value="Private Cruise">
-Private Cruise
-</div>
-
+<div class="option"><input type="radio" name="night" value="Cosy Night In" required> Cosy Night In</div>
+<div class="option"><input type="radio" name="night" value="Thrill of the Cruise"> Thrill of the Cruise</div>
+<div class="option"><input type="radio" name="night" value="Private Cruise"> Private Cruise</div>
 </div>
 
 <div class="question">
-
 <h3>2. Whatcha got on the menu there, looks pretty good?</h3>
-
-<div class="option">
-<input type="radio" name="food" value="Burgers" required>
-Burgers
-</div>
-
-<div class="option">
-<input type="radio" name="food" value="Pasta">
-Pasta
-</div>
-
-<div class="option">
-<input type="radio" name="food" value="Noodles">
-Noodles
-</div>
-
-<div class="option">
-<input type="radio" name="food" value="Japanese">
-Japanese
-</div>
-
-<div class="option">
-<input type="radio" name="food" value="Alexander Chooses">
-Alexander ❤️ Chooses
-</div>
-
+<div class="option"><input type="radio" name="food" value="Burgers" required> Burgers</div>
+<div class="option"><input type="radio" name="food" value="Pasta"> Pasta</div>
+<div class="option"><input type="radio" name="food" value="Noodles"> Noodles</div>
+<div class="option"><input type="radio" name="food" value="Japanese"> Japanese</div>
+<div class="option"><input type="radio" name="food" value="Alexander Chooses"> Alexander ❤️ Chooses</div>
 </div>
 
 <div class="question">
-
 <h3>3. Attire</h3>
-
-<div class="option">
-<input type="radio" name="attire" value="Cute" required>
-Cute (Mini skirt) & A (Black pants, white top, russian style jacket)
+<div class="option"><input type="radio" name="attire" value="Cute" required> Cute (Mini skirt) & A (Black pants, white top, russian style jacket)</div>
+<div class="option"><input type="radio" name="attire" value="Cosy"> Cosy (Pants) & A (Sweat pants, black top, jumper)</div>
+<div class="option"><input type="radio" name="attire" value="Sexy"> Sexy (You Know More) & A (tech pants, black top, leather jacket)</div>
 </div>
 
-<div class="option">
-<input type="radio" name="attire" value="Cosy">
-Cosy (Pants) & A (Sweat pants, black top, jumper)
-</div>
-
-<div class="option">
-<input type="radio" name="attire" value="Sexy">
-Sexy (You Know More) & A (tech pants, black top, leather jacket)
-</div>
-
-</div>
-
-<button
-type="submit"
-class="btn">
-
-Submit
-
-</button>
-
+<button class="btn" type="submit">Submit</button>
 </form>
+</div>
 
+<div id="successPage" class="page">
+<h1>Your choices have been locked in ❤️</h1>
+<p style="color:#c084fc">Keep your calendar free.</p>
 </div>
 
 <script>
+const EMAILJS_PUBLIC_KEY="YOUR_PUBLIC_KEY";
+const EMAILJS_SERVICE_ID="YOUR_SERVICE_ID";
+const EMAILJS_TEMPLATE_ID="YOUR_TEMPLATE_ID";
+try{emailjs.init(EMAILJS_PUBLIC_KEY);}catch(e){}
 
-/* ==================================
-EMAILJS PLACEHOLDERS
-================================== */
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');}
 
-const EMAILJS_PUBLIC_KEY =
-"SoVqRpgiyWJEu2abn";
+document.getElementById('startBtn').onclick=()=>{startBtn.classList.add('clicked');setTimeout(()=>{showPage('gamePage');initGame();},500);};
 
-const EMAILJS_SERVICE_ID =
-"service_s7c8d6h";
-
-const EMAILJS_TEMPLATE_ID =
-"template_ckilj17";
-
-emailjs.init(EMAILJS_PUBLIC_KEY);
-
-/* ==================================
-PAGE NAVIGATION
-================================== */
-
-function showPage(id){
-
-document.querySelectorAll(".page")
-.forEach(page=>{
-page.classList.remove("active");
-});
-
-document.getElementById(id)
-.classList.add("active");
-
-}
-
-/* ==================================
-START BUTTON
-================================== */
-
-document
-.getElementById("startBtn")
-.addEventListener("click",()=>{
-
-document
-.getElementById("startBtn")
-.classList.add("clicked");
-
-setTimeout(()=>{
-
-showPage("gamePage");
-
-initGame();
-
-},500);
-
-});
-
-/* ==================================
-GAME VARIABLES
-================================== */
-
-const board =
-document.getElementById("gameBoard");
-
-const size = 4;
-
-let snake;
-let apple;
-let direction;
-let interval;
-
-let applesCollected = 0;
-
-const WIN_APPLES = 5;
-
-/* ==================================
-GAME START
-================================== */
+const board=document.getElementById('gameBoard');
+let snake,apple,direction,interval,applesCollected=0;
+const WIN_APPLES=5;
 
 function initGame(){
-
-applesCollected = 0;
-
-document.getElementById(
-"scoreText"
-).innerText =
-"Apples Collected: 0 / 5";
-
-board.innerHTML="";
-
-for(let i=0;i<16;i++){
-
-const cell =
-document.createElement("div");
-
-cell.classList.add("cell");
-
-board.appendChild(cell);
-
-}
-
-snake=[0];
-
-direction=1;
-
-spawnApple();
-
-draw();
-
+applesCollected=0;
+document.getElementById('scoreText').textContent='Apples Collected: 0 / 5';
+board.innerHTML='';
+for(let i=0;i<16;i++){let d=document.createElement('div');d.className='cell';board.appendChild(d);}
+snake=[0];direction=1;spawnApple();draw();
 clearInterval(interval);
-
-interval=setInterval(
-moveSnake,
-500
-);
-
+interval=setInterval(moveSnake,500);
 }
 
-/* ==================================
-APPLE
-================================== */
-
-function spawnApple(){
-
-do{
-
-apple=
-Math.floor(
-Math.random()*16
-);
-
-}
-while(
-snake.includes(apple)
-);
-
-}
-
-/* ==================================
-MOVE SNAKE
-================================== */
+function spawnApple(){do{apple=Math.floor(Math.random()*16)}while(snake.includes(apple));}
 
 function moveSnake(){
-
-const head =
-snake[snake.length-1];
-
-const next =
-head + direction;
-
-if(
-next < 0 ||
-next > 15 ||
-(direction===1 && head%4===3) ||
-(direction===-1 && head%4===0)
-){
-return;
-}
-
+const head=snake[snake.length-1];
+const next=head+direction;
+if(next<0||next>15||(direction===1&&head%4===3)||(direction===-1&&head%4===0))return;
 snake.push(next);
-
 if(next===apple){
-
 applesCollected++;
-
-document.getElementById(
-"scoreText"
-).innerText =
-`Apples Collected: ${applesCollected} / ${WIN_APPLES}`;
-
-if(
-applesCollected >= WIN_APPLES
-){
-
-winGame();
-
-return;
-
-}
-
+document.getElementById('scoreText').textContent=`Apples Collected: ${applesCollected} / 5`;
+if(applesCollected>=WIN_APPLES){winGame();return;}
 spawnApple();
-
-}
-else{
-
-snake.shift();
-
-}
-
+}else snake.shift();
 draw();
-
 }
-
-/* ==================================
-DRAW
-================================== */
 
 function draw(){
+document.querySelectorAll('.cell').forEach(c=>c.className='cell');
+snake.forEach(i=>document.querySelectorAll('.cell')[i].classList.add('snake'));
+document.querySelectorAll('.cell')[apple].classList.add('apple');
+}
 
-document
-.querySelectorAll(".cell")
-.forEach(cell=>{
+function changeDirection(dir){
+if(dir==='up'&&direction!==4)direction=-4;
+if(dir==='down'&&direction!==-4)direction=4;
+if(dir==='left'&&direction!==1)direction=-1;
+if(dir==='right'&&direction!==-1)direction=1;
+}
 
-cell.className="cell";
-
+document.addEventListener('keydown',e=>{
+if(e.key==='ArrowUp')changeDirection('up');
+if(e.key==='ArrowDown')changeDirection('down');
+if(e.key==='ArrowLeft')changeDirection('left');
+if(e.key==='ArrowRight')changeDirection('right');
 });
-
-snake.forEach(index=>{
-
-document
-.querySelectorAll(".cell")[index]
-.classList.add("snake");
-
-});
-
-document
-.querySelectorAll(".cell")[apple]
-.classList.add("apple");
-
-}
-
-/* ==================================
-KEYBOARD CONTROLS
-================================== */
-
-document
-.addEventListener("keydown",(e)=>{
-
-switch(e.key){
-
-case "ArrowUp":
-if(direction!==4) direction=-4;
-break;
-
-case "ArrowDown":
-if(direction!==-4) direction=4;
-break;
-
-case "ArrowLeft":
-if(direction!==1) direction=-1;
-break;
-
-case "ArrowRight":
-if(direction!==-1) direction=1;
-break;
-
-}
-
-});
-
-/* ==================================
-SWIPE CONTROLS
-================================== */
-
-let startX = 0;
-let startY = 0;
-
-const gamePage =
-document.getElementById("gamePage");
-
-gamePage.addEventListener(
-"touchstart",
-(e)=>{
-
-startX =
-e.changedTouches[0].screenX;
-
-startY =
-e.changedTouches[0].screenY;
-
-},
-{passive:true}
-);
-
-gamePage.addEventListener(
-"touchend",
-(e)=>{
-
-const endX =
-e.changedTouches[0].screenX;
-
-const endY =
-e.changedTouches[0].screenY;
-
-const diffX =
-endX - startX;
-
-const diffY =
-endY - startY;
-
-if(
-Math.abs(diffX) >
-Math.abs(diffY)
-){
-
-if(diffX > 30){
-
-if(direction!==-1)
-direction=1;
-
-}
-else if(diffX < -30){
-
-if(direction!==1)
-direction=-1;
-
-}
-
-}
-else{
-
-if(diffY > 30){
-
-if(direction!==-4)
-direction=4;
-
-}
-else if(diffY < -30){
-
-if(direction!==4)
-direction=-4;
-
-}
-
-}
-
-},
-{passive:true}
-);
-
-/* ==================================
-WIN GAME
-================================== */
 
 function winGame(){
-
 clearInterval(interval);
-
-board.style.opacity="0.3";
-
 let count=0;
-
-const celebration =
-setInterval(()=>{
-
-confetti({
-
-particleCount:150,
-spread:120,
-origin:{y:0.6}
-
-});
-
-count++;
-
-if(count>=8){
-
-clearInterval(
-celebration
-);
-
-document
-.getElementById(
-"winSection"
-)
-.style.display="block";
-
-}
-
+let t=setInterval(()=>{
+confetti({particleCount:150,spread:120,origin:{y:.6}});
+if(++count>=8){clearInterval(t);document.getElementById('winSection').style.display='block';}
 },300);
-
 }
-
-/* ==================================
-EMAIL PAGE
-================================== */
 
 function submitEmail(){
-
-const email =
-document.getElementById(
-"email"
-).value;
-
-if(!email){
-
-alert(
-"Please enter your email."
-);
-
-return;
-
+const email=document.getElementById('email').value;
+if(!email)return alert('Please enter your email');
+localStorage.setItem('winnerEmail',email);
+showPage('questionPage');
 }
 
-localStorage.setItem(
-"winnerEmail",
-email
-);
-
-showPage(
-"questionPage"
-);
-
-}
-
-/* ==================================
-FINAL FORM
-================================== */
-
-document
-.getElementById("finalForm")
-.addEventListener(
-"submit",
-function(e){
-
+document.getElementById('finalForm').addEventListener('submit',function(e){
 e.preventDefault();
-
 const data={
-
-email:
-localStorage.getItem(
-"winnerEmail"
-),
-
-night:
-document.querySelector(
-'input[name="night"]:checked'
-).value,
-
-food:
-document.querySelector(
-'input[name="food"]:checked'
-).value,
-
-attire:
-document.querySelector(
-'input[name="attire"]:checked'
-).value
-
+email:localStorage.getItem('winnerEmail'),
+night:document.querySelector('input[name="night"]:checked').value,
+food:document.querySelector('input[name="food"]:checked').value,
+attire:document.querySelector('input[name="attire"]:checked').value
 };
-
-emailjs.send(
-EMAILJS_SERVICE_ID,
-EMAILJS_TEMPLATE_ID,
-data
-)
-.then(()=>{
-
+try{emailjs.send(EMAILJS_SERVICE_ID,EMAILJS_TEMPLATE_ID,data);}catch(err){}
 createCalendarInvite();
-
-alert(
-"Success! Email sent."
-);
-
-})
-.catch(()=>{
-
-alert(
-"Configure EmailJS first."
-);
-
+showPage('successPage');
 });
-
-});
-
-/* ==================================
-CALENDAR INVITE
-================================== */
 
 function createCalendarInvite(){
-
-const ics =
-`BEGIN:VCALENDAR
+const ics=`BEGIN:VCALENDAR
 VERSION:2.0
 BEGIN:VEVENT
 SUMMARY:Date Night
@@ -787,27 +202,12 @@ DTSTART:20261231T180000
 DTEND:20261231T220000
 END:VEVENT
 END:VCALENDAR`;
-
-const blob =
-new Blob(
-[ics],
-{type:'text/calendar'}
-);
-
-const link =
-document.createElement("a");
-
-link.href =
-URL.createObjectURL(blob);
-
-link.download =
-"date-night.ics";
-
-link.click();
-
+const blob=new Blob([ics],{type:'text/calendar'});
+const a=document.createElement('a');
+a.href=URL.createObjectURL(blob);
+a.download='date-night.ics';
+a.click();
 }
-
 </script>
-
 </body>
 </html>
